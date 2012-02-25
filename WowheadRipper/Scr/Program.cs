@@ -16,9 +16,12 @@ namespace WowheadRipper
 {
     class Program
     {
+        static public UInt32 datad;
+        static public UInt32 datat;
 
         static void Main(string[] args)
         {
+            datad = 0;
             Console.Title = "Wowhead Ripper";
 
             if (args.Length != 2 || !args[0].Contains("-file"))
@@ -42,8 +45,10 @@ namespace WowheadRipper
             Thread mainThread = new Thread(new ThreadStart(StartMainThread));
             mainThread.Start();
 
-            while (Console.ReadLine() != string.Format("exit") || Defines.programExit == 1)
-                Defines.programExit = 0;
+            while ((Console.ReadLine() != string.Format("exit") && Defines.programExit == 0) && Defines.programExit == 0)
+                continue;
+
+            return;
         }
 
         static void StartMainThread()
@@ -55,12 +60,16 @@ namespace WowheadRipper
 
             if (count != 0)
                 Console.WriteLine("Sucesfully loaded file {0}, {1} records found", Defines.fileName, count);
+
             else
             {
                 Console.WriteLine("File {0} is empty", Defines.fileName);
                 Console.WriteLine("Press any key to continue...");
                 Defines.programExit = 1;
             }
+
+            datat = (UInt32)count;
+            Console.WriteLine("");
 
             Thread writerThread = new Thread(new ThreadStart(WriterThread));
             writerThread.Start();
@@ -76,15 +85,15 @@ namespace WowheadRipper
                     continue;
                 }
 
-                UInt32 type =  UInt32.Parse(numbers[0]);
-                UInt32 entry =  UInt32.Parse(numbers[1]);
+                UInt32 type =  UInt32.Parse(numbers[1]);
+                UInt32 entry =  UInt32.Parse(numbers[0]);
                 ThreadStart starter = delegate { ParseData(entry, type); };
                 Thread thread = new Thread(starter);
                 thread.Start();
 
                 Thread.Sleep(700); // Else connections will time out or your net will go down
             }
-
+            return;
         }
 
         public static void ParseData(UInt32 type, UInt32 entry)
@@ -100,6 +109,7 @@ namespace WowheadRipper
             catch (Exception e)
             {
                 Console.WriteLine("{0} Id {1} Doesn't exist ({2})", Defines.id_name[type], entry, e.Message);
+                datad++;
                 return;
             }
 
@@ -171,8 +181,10 @@ namespace WowheadRipper
                 }
 
                 Console.WriteLine("Parsed {0} loot for entry {1}", Defines.id_name[0], entry);
+                datad++;
                 return;
             }
+            datad++;
             return;
         }
 
@@ -180,16 +192,33 @@ namespace WowheadRipper
         {
             StreamWriter file = new StreamWriter("parsed_data.sql", true);
             file.AutoFlush = true;
-
             while (true && Defines.programExit == 0)
             {
-                foreach (string str in Defines.stream)
+                Console.WriteLine("I lold");
+                UInt32 dataWritten = 0;
+                Queue<string> copy = Defines.stream; // prevent crash
+                foreach (string str in copy)
                 {
+                    dataWritten = 1;
                     file.WriteLine(str);
                 }
+
+                if (datad == datat && Defines.stream.Count == 0)
+                    Defines.programExit = 1;
+
+                Thread.Sleep(100);
+
+                if (dataWritten == 1)
+                    Defines.stream.Clear();
             }
             file.Flush();
             file.Close();
+
+            Console.WriteLine("");
+            Console.WriteLine("Parsing done");
+            Console.WriteLine("Press any key to continue...");
+
+            return;
         }
         static List<string> ReadPage(string url)
         {
