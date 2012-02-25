@@ -126,7 +126,6 @@ namespace WowheadRipper
                     string str = m2.Groups[0].Captures[0].Value;
                     string[] numbers = Regex.Split(str, @"\D+");
                     totalCount = uint.Parse(numbers[2]);
-                    Console.WriteLine(""+totalCount+" at entry"+ entry);
                 }
 
                 if (!m.Success)
