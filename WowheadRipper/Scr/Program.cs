@@ -125,7 +125,8 @@ namespace WowheadRipper
                 {
                     string str = m2.Groups[0].Captures[0].Value;
                     string[] numbers = Regex.Split(str, @"\D+");
-                        totalCount = uint.Parse(numbers[2]);
+                    totalCount = uint.Parse(numbers[2]);
+                    Console.WriteLine(""+totalCount+" at entry"+ entry);
                 }
 
                 if (!m.Success)
@@ -158,7 +159,7 @@ namespace WowheadRipper
                         int ArraySize = ((Array)objectInto["stack"]).GetLength(0);
                         int[] stack = new int[ArraySize];
                         Array.Copy((Array)objectInto["stack"], stack, ArraySize);
-                        pct = (float)count / totalCount * 100.0f;
+                        pct = (float)m_count / totalCount * 100.0f;
                         maxcount = stack[1];
                         mincount = stack[0];
                         pct = (float)Math.Round(pct, 3);
@@ -194,7 +195,6 @@ namespace WowheadRipper
             file.AutoFlush = true;
             while (true && Defines.programExit == 0)
             {
-                Console.WriteLine("I lold");
                 UInt32 dataWritten = 0;
                 Queue<string> copy = Defines.stream; // prevent crash
                 foreach (string str in copy)
