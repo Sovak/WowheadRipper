@@ -82,7 +82,7 @@ namespace WowheadRipper
             while (reader.Peek() >= 0)
             {
                 string str = reader.ReadLine();
-                string[] numbers = Regex.Split(str, @"\D+");
+                string[] numbers = Regex.Split(str, @"\D");
 
                 if (numbers.Length != 2)
                 {
@@ -90,16 +90,16 @@ namespace WowheadRipper
                     continue;
                 }
 
-                UInt32 type =  UInt32.Parse(numbers[1]);
-                UInt32 entry =  UInt32.Parse(numbers[0]);
+                UInt32 type =  UInt32.Parse(numbers[0]);
+                UInt32 entry =  UInt32.Parse(numbers[1]);
 
                 if (type > Defines.maxType)
                 {
-                    Console.WriteLine("Incorrect type for {0}, skipping", str);
+                    Console.WriteLine("Incorrect type {0} for {1}, skipping", type, entry);
                     continue;
                 }
 
-                ThreadStart starter = delegate { ParseData(entry, type); };
+                ThreadStart starter = delegate { ParseData(type, entry); };
                 Thread thread = new Thread(starter);
                 thread.Start();
 
@@ -120,7 +120,7 @@ namespace WowheadRipper
             }
             catch (Exception e)
             {
-                Console.WriteLine("{0} Id {1} Doesn't exist ({2})", Defines.id_name[type], entry, e.Message);
+                Console.WriteLine("Id {0} Doesn't exist ({1})", entry, e.Message);
                 datad++;
                 return;
             }
@@ -149,7 +149,7 @@ namespace WowheadRipper
                 object[] m_object = (object[])json.DeserializeObject(data);
 
                 AddToStream(string.Format("-- Parsing {0} loot for entry {1}", Defines.id_name[0], entry));
-                AddToStream(string.Format("DELETE FROM `{0}` WHERE entry = {1};", Defines.db_name[type]));
+                AddToStream(string.Format("DELETE FROM `{0}` WHERE entry = {1};", Defines.db_name[type], entry));
                 AddToStream("");
 
                 foreach (dict objectInto in m_object)
