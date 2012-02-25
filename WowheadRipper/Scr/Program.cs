@@ -19,6 +19,11 @@ namespace WowheadRipper
         static public UInt32 datad;
         static public UInt32 datat;
 
+        static void AddToStream(string str)
+        {
+            Defines.stream.Enqueue(str);
+        }
+
         static void Main(string[] args)
         {
             datad = 0;
@@ -87,6 +92,13 @@ namespace WowheadRipper
 
                 UInt32 type =  UInt32.Parse(numbers[1]);
                 UInt32 entry =  UInt32.Parse(numbers[0]);
+
+                if (type > Defines.maxType)
+                {
+                    Console.WriteLine("Incorrect type for {0}, skipping", str);
+                    continue;
+                }
+
                 ThreadStart starter = delegate { ParseData(entry, type); };
                 Thread thread = new Thread(starter);
                 thread.Start();
@@ -135,7 +147,10 @@ namespace WowheadRipper
                 string data = m.Groups[1].Captures[0].Value;
                 data = data.Replace("[,", "[0,");   // otherwise deserializer complains
                 object[] m_object = (object[])json.DeserializeObject(data);
-                Defines.stream.Enqueue(string.Format("-- Parsing {0} loot for entry {1}", Defines.id_name[0], entry));
+
+                AddToStream(string.Format("-- Parsing {0} loot for entry {1}", Defines.id_name[0], entry));
+                AddToStream(string.Format("DELETE FROM `{0}` WHERE entry = {1};", Defines.db_name[type]));
+                AddToStream("");
 
                 foreach (dict objectInto in m_object)
                 {
@@ -166,7 +181,7 @@ namespace WowheadRipper
                         strpct = strpct.Replace(",", "."); // needs to be changed otherwise SQL errors
                         string str = string.Format("INSERT INTO `{0}` VALUES ( '{1}', '{2}', '{3}', '{4}', '{5}', '{6}' , '{7}'); -- {8}",
                         Defines.db_name[type], entry, id, strpct, 1, lootmode, mincount, maxcount, name);
-                        Defines.stream.Enqueue(str);
+                        AddToStream(str);
                     }
                     catch (Exception e)
                     {
@@ -176,8 +191,8 @@ namespace WowheadRipper
 
                 if (count != 0)
                 {
-                    Defines.stream.Enqueue(string.Format("-- Parsed {0} loot for entry {1}", Defines.id_name[0], entry));
-                    Defines.stream.Enqueue("");
+                    AddToStream(string.Format("-- Parsed {0} loot for entry {1}", Defines.id_name[0], entry));
+                    AddToStream("");
                 }
 
                 Console.WriteLine("Parsed {0} loot for entry {1}", Defines.id_name[0], entry);
