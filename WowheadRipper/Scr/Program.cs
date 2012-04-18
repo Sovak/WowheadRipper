@@ -196,8 +196,6 @@ namespace WowheadRipper
                 }
 
                 Console.WriteLine("Parsed {0} loot for entry {1}", Defines.id_name[0], entry);
-                datad++;
-                return;
             }
             datad++;
             return;
@@ -207,6 +205,7 @@ namespace WowheadRipper
         {
             StreamWriter file = new StreamWriter("parsed_data.sql", true);
             file.AutoFlush = true;
+
             while (true && Defines.programExit == 0)
             {
                 UInt32 dataWritten = 0;
@@ -225,12 +224,13 @@ namespace WowheadRipper
                 if (dataWritten == 1)
                     Defines.stream.Clear();
             }
+
             file.Flush();
             file.Close();
-
             Console.WriteLine("");
             Console.WriteLine("Parsing done");
             Console.WriteLine("Press any key to continue...");
+            Console.Beep();
 
             return;
         }
