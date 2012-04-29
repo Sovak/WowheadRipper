@@ -238,7 +238,7 @@ namespace WowheadRipper
         {
             HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(url);
             myRequest.Method = "GET";
-            myRequest.UserAgent = "	Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"; // I have tried IE ones, only mozilla ones parse properly items
+            myRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0"; // Only this one can parse items
             WebResponse myResponse = myRequest.GetResponse();
             StreamReader sr = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.UTF8);
 
