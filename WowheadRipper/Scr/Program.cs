@@ -148,7 +148,7 @@ namespace WowheadRipper
                 data = data.Replace("[,", "[0,");   // otherwise deserializer complains
                 object[] m_object = (object[])json.DeserializeObject(data);
 
-                AddToStream(string.Format("-- Parsing {0} loot for entry {1}", Defines.id_name[0], entry));
+                AddToStream(string.Format("-- Parsing {0} loot for entry {1}", Defines.id_name[type], entry));
                 AddToStream(string.Format("DELETE FROM `{0}` WHERE entry = {1};", Defines.db_name[type], entry));
                 AddToStream("");
 
