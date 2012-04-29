@@ -236,9 +236,11 @@ namespace WowheadRipper
         }
         static List<string> ReadPage(string url)
         {
-            WebRequest wrGETURL = WebRequest.Create(url);
-            Stream objStream = wrGETURL.GetResponse().GetResponseStream();
-            StreamReader objReader = new StreamReader(objStream);
+            HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(url);
+            myRequest.Method = "GET";
+            myRequest.UserAgent = "	Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+            WebResponse myResponse = myRequest.GetResponse();
+            StreamReader sr = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.UTF8);
 
             string sLine = "";
             int i = 0;
@@ -246,7 +248,7 @@ namespace WowheadRipper
             while (sLine != null)
             {
                 i++;
-                sLine = objReader.ReadLine();
+                sLine = sr.ReadLine();
                 if (sLine != null)
                     content.Add(sLine);
             }
