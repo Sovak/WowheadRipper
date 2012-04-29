@@ -27,6 +27,7 @@ namespace WowheadRipper
         static void Main(string[] args)
         {
             datad = 0;
+            Console.Clear();
             Console.Title = "Wowhead Ripper";
 
             if (args.Length != 2 || !args[0].Contains("-file"))
@@ -65,7 +66,6 @@ namespace WowheadRipper
 
             if (count != 0)
                 Console.WriteLine("Sucesfully loaded file {0}, {1} records found", Defines.fileName, count);
-
             else
             {
                 Console.WriteLine("File {0} is empty", Defines.fileName);
