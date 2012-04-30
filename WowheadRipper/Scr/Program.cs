@@ -191,11 +191,11 @@ namespace WowheadRipper
 
                 if (count != 0)
                 {
-                    AddToStream(string.Format("-- Parsed {0} loot for entry {1}", Defines.id_name[0], entry));
+                    AddToStream(string.Format("-- Parsed {0} loot for entry {1}", Defines.id_name[type], entry));
                     AddToStream("");
                 }
 
-                Console.WriteLine("Parsed {0} loot for entry {1}", Defines.id_name[0], entry);
+                Console.WriteLine("Parsed {0} loot for entry {1}", Defines.id_name[type], entry);
             }
             datad++;
             return;
