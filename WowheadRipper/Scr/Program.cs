@@ -163,8 +163,8 @@ namespace WowheadRipper
             }
             catch (Exception e)
             {
-                Console.WriteLine("Id {0} Doesn't exist ({1})", entry, e.Message);
                 datad++;
+                Console.WriteLine("{0}% - Id {1} Doesn't exist ({2})", Math.Round(datad / (float)datat * 100, 2), entry, e.Message);
                 return;
             }
 
@@ -240,10 +240,9 @@ namespace WowheadRipper
                         AddToStream(string.Format("-- Parsed {0} loot for entry {1}", Def.GetOutputName(typeId, subTypeId), entry));
                         AddToStream("");
                     }
-
-                    Console.WriteLine("Parsed {0} loot for entry {1}", Def.GetOutputName(typeId, subTypeId), entry);
                 }
                 datad++;
+                Console.WriteLine("{0}% - Parsed {1} loot for entry {2}", Math.Round(datad / (float)datat * 100, 2), Def.GetOutputName(typeId, subTypeId), entry);
             }
             return;
         }
