@@ -25,7 +25,7 @@ namespace WowheadRipper
             int f = 0;
             for (Int32 i = 0; i < 32; i++)
                 if ((Flags & (1 << i)) == 1)
-                    if (i <= maxSubClassTypeId[i])
+                    if (i < maxSubClassTypeId[TypeId])
                         f++;
             return f;
         }

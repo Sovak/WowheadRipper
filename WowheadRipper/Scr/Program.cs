@@ -35,7 +35,7 @@ namespace WowheadRipper
             List<int> f = new List<int>();
             for (Int32 i = 0; i < 32; i++)
                 if ((num & (1 << i)) == 1)
-                    if (i <= Def.GetMaxSubTypeId(i))
+                    if (i < Def.GetMaxSubTypeId((int)typeId))
                         f.Add(i);
             return f;
         }
