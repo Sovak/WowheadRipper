@@ -17,145 +17,106 @@ namespace WowheadRipper
     class Program
     {
         static private Defines Def = new Defines();
-        static private UInt32 datad;
-        static private UInt32 datat;
+        static private Int32 datad = 0;
+        static private Dictionary<KeyValuePair<uint, uint>, int> commandList = new Dictionary<KeyValuePair<uint, uint>, int>();
+        static StreamWriter outPut = new StreamWriter("data.sql", true);
+        static Mutex mut = new Mutex();
 
-        static void AddToStream(string str)
+        static void WriteLog(string str)
         {
-            Def.stream.Enqueue(str);
-        }
-
-        static void PressExit()
-        {
-            Console.WriteLine("Press any key to continue...");
-        }
-
-        static List<int> ExtractFlags(UInt32 typeId, Int32 num)
-        {
-            List<int> f = new List<int>();
-            for (Int32 i = 0; i < 32; i++)
-                if ((num & (1 << i)) == 1)
-                    if (i < Def.GetMaxSubTypeId((int)typeId))
-                        f.Add(i);
-            return f;
+            mut.WaitOne();
+            outPut.WriteLine(str);
+            mut.ReleaseMutex();
         }
 
         static void Main(string[] args)
         {
-            datad = 0;
+            outPut.AutoFlush = true;
             Console.Clear();
             Console.Title = "Wowhead Ripper";
+            List<string> files = new List<string>();
 
-            if (args.Length != 2 || !args[0].Contains("-file"))
+            foreach (string fileName in args)
             {
-                Console.WriteLine("Usage WowheadRipper -file <filename>");
-                PressExit();
-                Console.ReadKey();
-                return;
+                if (!File.Exists(fileName))
+                {
+                    Console.WriteLine("File {0} doesnt exist, skipping", fileName);
+                    continue;
+                }
+                if (File.ReadAllLines(fileName).Length == 0)
+                {
+                    Console.WriteLine("File {0} is empty, skipping", fileName);
+                    continue;
+                }
+                files.Add(fileName);
             }
 
-            Def.fileName = args[1];
-
-            if (!File.Exists(Def.fileName))
+            foreach (string fileName in files)
             {
-                Console.WriteLine("File {0} doesnt exist", Def.fileName);
-                PressExit();
-                Console.ReadKey();
-                return;
+                Console.WriteLine("Loading file {0} ...", fileName);
+                StreamReader file = new StreamReader(fileName);
+
+                while (file.Peek() >= 0)
+                {
+                    string Line = file.ReadLine();
+                    List<uint> lineData = Def.GetAllNumbersOfString(Line);
+
+                    if (lineData.Count != 3)
+                    {
+                        Console.WriteLine("Incorrect format for line \"{0}\"", Line);
+                        continue;
+                    }
+
+                    UInt32 typeId = lineData.ToArray()[0];
+                    Int32 subTypeIdFlag = (int)lineData.ToArray()[1];
+                    UInt32 entry = lineData.ToArray()[2];
+
+                    if (typeId >= Def.GetMaxTypeId())
+                    {
+
+                        Console.WriteLine("Incorrect typeId for line \"{0}\"", Line);
+                        continue;
+                    }
+
+                    if (subTypeIdFlag >= (1 << (int)Def.GetMaxTypeId()))
+                    {
+
+                        Console.WriteLine("Incorrect flags for line \"{0}\"", Line);
+                        continue;
+                    }
+
+                    if (!commandList.Keys.Contains(new KeyValuePair<uint, uint>(typeId, entry)))
+                         commandList.Add(new KeyValuePair<uint, uint>(typeId, entry), subTypeIdFlag);
+                    else
+                        commandList[new KeyValuePair<uint, uint>(typeId, entry)] |= subTypeIdFlag;
+                }
+                Console.WriteLine("File {0} loaded...", fileName);
             }
 
-            //Lets take this to other thread, this one will be waiting for program exit
-            Thread mainThread = new Thread(new ThreadStart(StartMainThread));
-            mainThread.Start();
+            Console.WriteLine("Got {0} records to parse", commandList.Count);
+            Console.WriteLine("Starting Parsing");
 
-            while ((Console.ReadLine() != string.Format("exit") && Def.programExit == 0) && Def.programExit == 0)
-                continue;
+            foreach (KeyValuePair<uint, uint> key in commandList.Keys)
+            {
+                new Thread(new ThreadStart(delegate { ParseData(key.Key, commandList[key], key.Value); })).Start();
+                Thread.Sleep(700); // Needs to be done because Wowhead will think that you are a bot
+            }
 
-            return;
+            Console.Beep();
+            Console.WriteLine("Parsing done!");
+            Console.WriteLine("Press any key to continue...");
+            outPut.Flush();
+            outPut.Close();
+            Console.ReadKey();
+            Environment.Exit(1);
         }
 
-        static void StartMainThread()
-        {
-            var lines = File.ReadAllLines(Def.fileName);
-            Int32 count = lines.Length;
-
-            if (count != 0)
-                Console.WriteLine("Sucesfully loaded file {0}, {1} records found, please wait till parser starts parsing", Def.fileName, count);
-            else
-            {
-                Console.WriteLine("File {0} is empty", Def.fileName);
-                PressExit();
-                Def.programExit = 1;
-            }
-
-            Console.WriteLine("");
-
-            StreamReader tester = new StreamReader(Def.fileName);
-            while (tester.Peek() >= 0)
-            {
-                string str = tester.ReadLine();
-                string[] numbers = Regex.Split(str, @"\D");
-
-                if (numbers.Length != 3)
-                    continue;
-
-                UInt32 typeId = UInt32.Parse(numbers[0]);
-                UInt32 subTypeIdFlag = UInt32.Parse(numbers[1]);
-    
-                if (typeId >= Def.GetMaxTypeId())
-                    continue;
-
-                if (subTypeIdFlag >= (1 << (int)Def.GetMaxTypeId()))
-                    continue;
-
-                datat += (UInt32)Def.GetValidFlags(typeId, subTypeIdFlag);
-            }
-
-            StreamReader reader = new StreamReader(Def.fileName);
-            Thread writerThread = new Thread(new ThreadStart(WriterThread));
-            writerThread.Start();
-
-            while (reader.Peek() >= 0)
-            {
-                string str = reader.ReadLine();
-                string[] numbers = Regex.Split(str, @"\D");
-
-                if (numbers.Length != 3)
-                {
-                    Console.WriteLine("Incorrect format for {0}, skipping", str);
-                    continue;
-                }
-
-                UInt32 typeId = UInt32.Parse(numbers[0]);
-                UInt32 subTypeIdFlag = UInt32.Parse(numbers[1]);
-                UInt32 entry = UInt32.Parse(numbers[2]);
-
-                if (typeId >= Def.GetMaxTypeId())
-                {
-                    Console.WriteLine("Incorrect TypeId {0} for {1}, skipping", typeId, entry);
-                    continue;
-                }
-
-                if (subTypeIdFlag >= (1 << (int)Def.GetMaxTypeId()))
-                {
-                    Console.WriteLine("Incorrect SubTypeId Flag {0} for {1}, skipping", subTypeIdFlag, entry);
-                    continue;
-                }
-
-                ThreadStart starter = delegate { ParseData(typeId, subTypeIdFlag, entry); };
-                Thread thread = new Thread(starter);
-                thread.Start();
-                Thread.Sleep(700); // Else connections will time out or your net will go down
-            }
-            return;
-        }
-
-        public static void ParseData(UInt32 typeId, UInt32 subTypeIdFlag, UInt32 entry)
+        public static void ParseData(UInt32 typeId, Int32 subTypeIdFlags, UInt32 entry)
         {
             UInt32 totalCount = 0;
             UInt32 count = 0;
             List<string> content;
-            List<int> ids = ExtractFlags(typeId, (Int32)subTypeIdFlag);
+            List<int> ids = Def.ExtractFlags(typeId, subTypeIdFlags);
 
             try
             {
@@ -163,40 +124,29 @@ namespace WowheadRipper
             }
             catch (Exception e)
             {
-                datad++;
-                Console.WriteLine("{0}% - Id {1} Doesn't exist ({2})", Math.Round(datad / (float)datat * 100, 2), entry, e.Message);
+                datad += Def.GetValidFlags(typeId, subTypeIdFlags);
+                Console.WriteLine("{0}% - Error while parsing Entry {1} ({2})", Math.Round(datad / (float)commandList.Count * 100, 2), entry, e.Message);
                 return;
             }
 
-            foreach (int tId in ids)
+            foreach (uint subTypeId in ids)
             {
-                UInt32 subTypeId = (UInt32)tId;
                 foreach (string line in content)
                 {
-                    Regex dataRegex = Def.GetDataRegex(typeId, subTypeId);
-                    Regex totalCountRegex = Def.GetTotalCountRegex(typeId, subTypeId);
-
-                    Match m = dataRegex.Match(line);
-                    Match m2 = totalCountRegex.Match(line);
-
-                    if (m2.Success)
-                    {
-                        string str = m2.Groups[0].Captures[0].Value;
-                        string[] numbers = Regex.Split(str, @"\D+");
-                        totalCount = uint.Parse(numbers[2]);
-                    }
+                    Match m = Def.GetDataRegex(typeId, subTypeId).Match(line);
 
                     if (!m.Success)
                         continue;
+
+                    totalCount = uint.Parse(Def.GetStringBetweenTwoOthers(line, "_totalCount: ", ","));
 
                     var json = new JavaScriptSerializer() { MaxJsonLength = int.MaxValue };
                     string data = m.Groups[1].Captures[0].Value;
                     data = data.Replace("[,", "[0,");   // otherwise deserializer complains
                     object[] m_object = (object[])json.DeserializeObject(data);
 
-                    AddToStream(string.Format("-- Parsing {0} loot for entry {1}", Def.GetOutputName(typeId, subTypeId), entry));
-                    AddToStream(string.Format("DELETE FROM `{0}` WHERE entry = {1};", Def.GetDBName(typeId, subTypeId), entry));
-                    AddToStream("");
+                    WriteLog(string.Format("-- Parsing {0} loot for entry {1}", Def.GetOutputName(typeId, subTypeId), entry));
+                    WriteLog(string.Format("DELETE FROM `{0}` WHERE entry = {1};", Def.GetDBName(typeId, subTypeId), entry));
 
                     foreach (dict objectInto in m_object)
                     {
@@ -227,7 +177,7 @@ namespace WowheadRipper
                             strpct = strpct.Replace(",", "."); // needs to be changed otherwise SQL errors
                             string str = string.Format("INSERT INTO `{0}` VALUES ( '{1}', '{2}', '{3}', '{4}', '{5}', '{6}' , '{7}'); -- {8}",
                             Def.GetDBName(typeId, subTypeId), entry, id, strpct, 1, lootmode, mincount, maxcount, name);
-                            AddToStream(str);
+                            WriteLog(str);
                         }
                         catch (Exception e)
                         {
@@ -237,47 +187,13 @@ namespace WowheadRipper
 
                     if (count != 0)
                     {
-                        AddToStream(string.Format("-- Parsed {0} loot for entry {1}", Def.GetOutputName(typeId, subTypeId), entry));
-                        AddToStream("");
+                        WriteLog(string.Format("-- Parsed {0} loot for entry {1}", Def.GetOutputName(typeId, subTypeId), entry));
+                        WriteLog("");
                     }
                 }
                 datad++;
-                Console.WriteLine("{0}% - Parsed {1} loot for entry {2}", Math.Round(datad / (float)datat * 100, 2), Def.GetOutputName(typeId, subTypeId), entry);
+                Console.WriteLine("{0}% - Parsed {1} loot for entry {2}", Math.Round(datad / (float)commandList.Count * 100, 2), Def.GetOutputName(typeId, subTypeId), entry);
             }
-            return;
-        }
-
-        public static void WriterThread()
-        {
-            StreamWriter file = new StreamWriter("parsed_data.sql", true);
-            file.AutoFlush = true;
-
-            while (true && Def.programExit == 0)
-            {
-                UInt32 dataWritten = 0;
-                Queue<string> copy = Def.stream; // prevent crash
-                foreach (string str in copy)
-                {
-                    dataWritten = 1;
-                    file.WriteLine(str);
-                }
-
-                if (datad == datat && Def.stream.Count == 0)
-                    Def.programExit = 1;
-
-                Thread.Sleep(100);
-
-                if (dataWritten == 1)
-                    Def.stream.Clear();
-            }
-
-            file.Flush();
-            file.Close();
-            Console.WriteLine("");
-            Console.WriteLine("Parsing done");
-            PressExit();
-            Console.Beep();
-
             return;
         }
 
@@ -285,9 +201,9 @@ namespace WowheadRipper
         {
             HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(url);
             myRequest.Method = "GET";
-            myRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0"; // Only this one can parse items
+            myRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0"; // Only browsers can read all data, wowhead filters out bots
             WebResponse myResponse = myRequest.GetResponse();
-            StreamReader sr = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.UTF8);
+            StreamReader sr = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.ASCII);
 
             string sLine = "";
             int i = 0;
