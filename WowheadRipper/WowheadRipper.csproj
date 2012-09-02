@@ -14,6 +14,7 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -65,6 +65,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
+    <Compile Include="Config.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Config.settings</DependentUpon>
+    </Compile>
+    <Compile Include="parsers\OutdatedQuestParser.cs" />
+    <Compile Include="parsers\LootParser.cs" />
+    <Compile Include="scr\Attributes.cs" />
+    <Compile Include="scr\AttributesLoader.cs" />
     <Compile Include="scr\Defines.cs" />
     <Compile Include="scr\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -94,6 +104,10 @@
   <ItemGroup>
     <None Include="app.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="Config.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Config.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
