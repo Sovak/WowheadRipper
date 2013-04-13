@@ -9,11 +9,12 @@ namespace WowheadRipper
         public enum ParserType
         {
             PARSER_TYPE_LOOT,
-            PARSER_TYPE_OUTDATED_QUEST
+            PARSER_TYPE_OUTDATED_QUEST,
+            PARSER_TYPE_VENDOR
         };
 
         private const int _maxTypeId = 5;
-        private const int _maxSubTypeId = 4;
+        private const int _maxSubTypeId = 5;
         private uint[] _maxSubClassTypeId = new uint[_maxTypeId];
         private string[] _wowhead_raw_name = new string[_maxTypeId];
         private string[,] _id_name = new string[_maxTypeId, _maxSubTypeId];
@@ -32,6 +33,7 @@ namespace WowheadRipper
                         f++;
             return f;
         }
+
         public List<int> ExtractFlags(UInt32 typeId, Int32 num)
         {
             List<int> f = new List<int>();
@@ -41,6 +43,7 @@ namespace WowheadRipper
                         f.Add(i);
             return f;
         }
+
         public List<uint> GetAllNumbersOfString(string str)
         {
             uint num = 0;
@@ -51,7 +54,9 @@ namespace WowheadRipper
                     numList.Add(num);
             return numList;
         }
-        public string GetOutputName(UInt32 TypeId, UInt32 subTypeId) { return _id_name[TypeId, subTypeId]; }
+
+        public string GetStreamName(UInt32 TypeId, UInt32 subTypeId) { return _id_name[TypeId, subTypeId]; }
+        public string GetRawName(UInt32 TypeId) { return _wowhead_raw_name[TypeId]; }
         public string GetDBName(UInt32 TypeId, UInt32 subTypeId) { return _id_db_name[TypeId, subTypeId]; }
         public string GenerateWowheadUrl(UInt32 typeId, UInt32 entry) { return string.Format("http://www.wowhead.com/{0}={1}", _wowhead_raw_name[typeId], entry); }
         public string GenerateWowheadFileName(UInt32 typeId, UInt32 entry) { return string.Format("{0}={1}", _wowhead_raw_name[typeId], entry); }
@@ -64,10 +69,12 @@ namespace WowheadRipper
 
             return Regex.Split(baseString, string.Format("(?<={0})(.*?)(?={1})", begin, end))[1];
         }
+
         public Match StringContains(string str, string contains)
         {
             return Regex.Match(str, StringToRegex(contains));
         }
+
         public string StringToRegex(string str)
         {
             str = str.Replace("=", "\\=");
@@ -77,6 +84,7 @@ namespace WowheadRipper
             str = str.Replace(".", "\\.");
             return str;
         }
+
         public Defines()
         {
             // Zone Parser
@@ -133,7 +141,7 @@ namespace WowheadRipper
 
             // Creature Paser
             _wowhead_raw_name[3] = "npc";
-            _maxSubClassTypeId[3] = 4;
+            _maxSubClassTypeId[3] = 5;
               // Drop
               _id_name[3, 0] = "drop";
                 _id_db_name[3, 0] = "creature_loot_template";
@@ -154,6 +162,11 @@ namespace WowheadRipper
                 _id_db_name[3, 3] = "engineering_loot_template";
                 _id_regex[3, 3] = new Regex(@"new Listview\(\{template: 'item', id: 'engineering'.*data: (\[.+\])\}\);");
                 _parser_type[3, 3] = ParserType.PARSER_TYPE_LOOT;
+              // Vendor
+              _id_name[3, 4] = "vendor";
+                _id_db_name[3, 4] = "npc_vendor";
+                _id_regex[3, 4] = new Regex(@"new Listview\(\{template: 'item', id: 'sells'.*data: (\[.+\])\}\);");
+                _parser_type[3, 4] = ParserType.PARSER_TYPE_VENDOR;
 
             // Quest Paser
             _wowhead_raw_name[4] = "quest";
