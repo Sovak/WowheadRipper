@@ -25,7 +25,7 @@ namespace WowheadRipper
                 {
                     var json = new JavaScriptSerializer() { MaxJsonLength = int.MaxValue };
                     String data = match.Groups[1].Captures[0].Value;
-                    data = data.Replace("[,", "[,");    // Otherwise deserializer will fail
+                    data = data.Replace("[,", "[0,");    // Otherwise deserializer will fail
                     data = data.Replace(",]", "]");
                     data = data.Replace("cost", "\"cost\"");
                     object[] objectArray = (object[])json.DeserializeObject(data);

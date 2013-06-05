@@ -38,7 +38,7 @@ namespace WowheadRipper
                     {
                         try
                         {
-                            UInt32 lootId = (UInt32)objectInto["id"];
+                            UInt32 lootId = (UInt32)(int)objectInto["id"];
                             Int32 maxcount = 1;
                             Int32 mincount = 1;
                             Double pct = 0.0f;
