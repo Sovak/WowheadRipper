@@ -98,15 +98,15 @@ namespace WowheadRipper
                     if (data.Value.itemId[i] != 0)
                         itemDefaultCount++;
 
-                    if (i > currencyCost.Count)
-                        continue;
+                    if (i <= currencyCost.Count)
+                        if (currencyCost.ContainsKey(data.Value.currencyId[i]))
+                            if (data.Value.currencyCount[i] == currencyCost[data.Value.currencyId[i]])
+                                currencyMatchCount++;
 
-                    if (currencyCost.ContainsKey(data.Value.currencyId[i]))
-                        if (data.Value.currencyCount[i] == currencyCost[data.Value.currencyId[i]])
-                            currencyMatchCount++;
-                    if (itemCost.ContainsKey(data.Value.itemId[i]))
-                        if (data.Value.itemCount[i] == itemCost[data.Value.itemId[i]])
-                            itemMatchCount++;
+                    if (i <= itemCost.Count)
+                        if (itemCost.ContainsKey(data.Value.itemId[i]))
+                            if (data.Value.itemCount[i] == itemCost[data.Value.itemId[i]])
+                                itemMatchCount++;
                 }
 
                 if (currencyMatchCount == currencyCost.Count && currencyCost.Count == currencyDefaultCount && itemMatchCount == itemCost.Count && itemCost.Count == itemDefaultCount)

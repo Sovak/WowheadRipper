@@ -160,22 +160,23 @@ namespace WowheadRipper
 
         static List<String> ReadPage(String url)
         {
-            HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(url);
-            myRequest.Method = "GET";
-            myRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0"; // Only browsers can read all data, wowhead filters out bots
-            myRequest.Timeout = 120000;
-            WebResponse myResponse = myRequest.GetResponse();
-            StreamReader sr = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.ASCII);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "GET";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0"; // Only browsers can read all data, wowhead filters out bots
+            request.Timeout = 120000;
+            request.Proxy = null;
+            WebResponse myResponse = request.GetResponse();
+            StreamReader streamReader = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.ASCII);
 
-            String sLine = "";
+            String line = "";
             int i = 0;
             List<String> content = new List<String>();
-            while (sLine != null)
+            while (line != null)
             {
                 i++;
-                sLine = sr.ReadLine();
-                if (sLine != null)
-                    content.Add(sLine);
+                line = streamReader.ReadLine();
+                if (line != null)
+                    content.Add(line);
             }
             return content;
 
