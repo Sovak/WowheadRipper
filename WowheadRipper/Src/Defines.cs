@@ -10,7 +10,8 @@ namespace WowheadRipper
         {
             PARSER_TYPE_LOOT,
             PARSER_TYPE_OUTDATED_QUEST,
-            PARSER_TYPE_VENDOR
+            PARSER_TYPE_VENDOR,
+            PARSER_TYPE_DROPPEDBY
         };
 
         private const int _maxTypeId = 5;
@@ -117,7 +118,7 @@ namespace WowheadRipper
 
             // Item Parser
             _wowhead_raw_name[2] = "item";
-            _maxSubClassTypeId[2] = 4; 
+            _maxSubClassTypeId[2] = 5;
               // Contains
               _id_name[2, 0] = "contains";
                 _id_db_name[2, 0] = "item_loot_template";
@@ -138,6 +139,11 @@ namespace WowheadRipper
                 _id_db_name[2, 3] = "disenchant_loot_template";
                 _id_regex[2, 3] = new Regex(@"new Listview\(\{template: 'item', id: 'disenchanting'.*data: (\[.+\])\}\);");
                 _parser_type[2, 3] = ParserType.PARSER_TYPE_LOOT;
+                // Dropped By
+              _id_name[2, 4] = "dropped-by";
+                _id_db_name[2, 4] = "creature_loot_template";
+                _id_regex[2, 4] = new Regex(@"new Listview\(\{template: 'npc', id: 'dropped-by'.*data: (\[.+\])\}\);");
+                _parser_type[2, 4] = ParserType.PARSER_TYPE_DROPPEDBY;
 
             // Creature Paser
             _wowhead_raw_name[3] = "npc";

@@ -75,6 +75,7 @@
     <Compile Include="Src\Datastores\DB2.cs" />
     <Compile Include="Src\Datastores\DBC.cs" />
     <Compile Include="Src\Datastores\ItemExtendedCostEntry.cs" />
+    <Compile Include="Src\Parsers\DroppedByParser.cs" />
     <Compile Include="Src\Parsers\OutdatedQuestParser.cs" />
     <Compile Include="Src\Parsers\LootParser.cs" />
     <Compile Include="Src\Parsers\VendorParser.cs" />

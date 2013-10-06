@@ -18,9 +18,24 @@ namespace WowheadRipper
         public static void ParseVendor(uint entry, uint typeId, uint subTypeId, List<String> content)
         {
             uint count = 0;
+            Int32 index = 0;
+
             foreach (String line in content)
             {
-                Match match = Def.GetDataRegex(typeId, subTypeId).Match(line);
+                String newLine = line;
+                index++;
+                int subIndex = 0;
+
+                if (line.Length > 1)
+                {
+                    while (newLine[newLine.Length - 1] == ',')
+                    {
+                        newLine = String.Format("{0}{1}", newLine, content[index + ++subIndex]);
+                    }
+                }
+
+                Match match = Def.GetDataRegex(typeId, subTypeId).Match(newLine);
+
                 if (match.Success)
                 {
                     var json = new JavaScriptSerializer() { MaxJsonLength = int.MaxValue };
