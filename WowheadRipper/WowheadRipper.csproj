@@ -77,11 +77,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="scr\Attributes.cs" />
-    <Compile Include="scr\AttributesLoader.cs" />
-    <Compile Include="scr\Defines.cs" />
-    <Compile Include="scr\ExtendedCost.cs" />
-    <Compile Include="scr\Program.cs" />
+    <Compile Include="src\Attributes.cs" />
+    <Compile Include="src\AttributesLoader.cs" />
+    <Compile Include="src\Defines.cs" />
+    <Compile Include="src\ExtendedCost.cs" />
+    <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WowheadRipper", "WowheadRipper.csproj", "{84A270B2-F197-4E06-B86B-9A504B909B3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WowheadRipper", "WowheadRipper/WowheadRipper.csproj", "{84A270B2-F197-4E06-B86B-9A504B909B3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
