@@ -79,7 +79,7 @@ namespace WowheadRipper
                             strpct = strpct.Replace(",", "."); // needs to be changed otherwise SQL errors
 
                             String str = String.Format("INSERT INTO `{0}` VALUES ( '{1}', '{2}', '{3}', '{4}', '{5}', '{6}' , '{7}'); -- {8}",
-                            Def.GetDBName(typeId, subTypeId), entry, lootId, strpct, 1, lootmode, mincount, maxcount, name);
+                            Def.GetDBName(typeId, subTypeId), lootId, entry, strpct, 1, lootmode, mincount, maxcount, name);
                             WriteSQL(typeId, entry, str);
                         }
                         catch (Exception e)
