@@ -69,20 +69,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="parsers\OutdatedQuestParser.cs" />
-    <Compile Include="parsers\LootParser.cs" />
-    <Compile Include="parsers\VendorParser.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
+    <Compile Include="Src\Parsers\OutdatedQuestParser.cs" />
+    <Compile Include="Src\Parsers\LootParser.cs" />
+    <Compile Include="Src\Parsers\VendorParser.cs" />
+    <Compile Include="Src\Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="src\Attributes.cs" />
-    <Compile Include="src\AttributesLoader.cs" />
-    <Compile Include="src\Defines.cs" />
-    <Compile Include="src\ExtendedCost.cs" />
-    <Compile Include="src\Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Src\Attributes.cs" />
+    <Compile Include="Src\AttributesLoader.cs" />
+    <Compile Include="Src\Defines.cs" />
+    <Compile Include="Src\ExtendedCost.cs" />
+    <Compile Include="Src\Program.cs" />
+    <Compile Include="Src\Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
@@ -107,11 +107,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
+    <None Include="Src\Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
