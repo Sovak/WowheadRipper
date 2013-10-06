@@ -18,12 +18,27 @@ namespace WowheadRipper
         public static void ParseLoot(uint entry, uint typeId, uint subTypeId, List<String> content)
         {
             Int32 objectCount = 0;
+            Int32 index = 0;
+
             foreach (String line in content)
             {
-                Match match = Def.GetDataRegex(typeId, subTypeId).Match(line);
+                String newLine = line;
+                index++;
+                int subIndex = 0;
+
+                if (line.Length > 1)
+                {
+                    while (newLine[newLine.Length - 1] == ',')
+                    {
+                        newLine = String.Format("{0}{1}", newLine, content[index + ++subIndex]);
+                    }
+                }
+
+                Match match = Def.GetDataRegex(typeId, subTypeId).Match(newLine);
+
                 if (match.Success)
                 {
-                    UInt32 totalCount = UInt32.Parse(Def.GetStringBetweenTwoOthers(line, "_totalCount: ", ","));
+                    UInt32 totalCount = UInt32.Parse(Def.GetStringBetweenTwoOthers(newLine, "_totalCount: ", ","));
                     JavaScriptSerializer json = new JavaScriptSerializer() { MaxJsonLength = int.MaxValue };
                     String data = match.Groups[1].Captures[0].Value;
                     data = data.Replace("[,", "[0,");  // Otherwise deserializer will fail

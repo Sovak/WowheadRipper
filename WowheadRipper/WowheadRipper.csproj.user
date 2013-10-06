@@ -14,6 +14,6 @@
     <StartArguments>smth.txt</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <StartArguments>disenchant.sovak</StartArguments>
+    <StartArguments>test.txt</StartArguments>
   </PropertyGroup>
 </Project>
