@@ -22,6 +22,7 @@ namespace WowheadRipper
         static Mutex mut = new Mutex();
         static public bool usePreCached = Properties.Settings.Default.usePreCached;
         static public String configFileName = Properties.Settings.Default.fileName;
+        static public string dbcFolder = "./dbc/";
 
         public static void WriteSQL(UInt32 type, UInt32 entry, String str)
         {
@@ -43,8 +44,9 @@ namespace WowheadRipper
         {
             Console.Clear();
             Console.Title = "Wowhead Ripper";
-            ExtendedCosts.Initialize();
             List<String> files = new List<String>();
+            DBC.LoadDBCs();
+            DB2.LoadDB2s();
 
             foreach (String fileName in args)
             {

@@ -94,6 +94,7 @@ namespace WowheadRipper
                                                     itemCost.Add(item, itemCount);
                                                 }
                                             }
+
                                             // 2rd array is currency, format [currencyId, count]
                                             else if (arrayIndex == 2)
                                             {
