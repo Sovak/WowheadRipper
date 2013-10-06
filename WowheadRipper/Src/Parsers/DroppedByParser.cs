@@ -15,7 +15,7 @@ namespace WowheadRipper
     public static partial class Program
     {
         [Ripper(Defines.ParserType.PARSER_TYPE_DROPPEDBY)]
-        public static void ParseLoot(uint entry, uint typeId, uint subTypeId, List<String> content)
+        public static void DroppedByParser(uint entry, uint typeId, uint subTypeId, List<String> content)
         {
             Int32 objectCount = 0;
             Int32 index = 0;
