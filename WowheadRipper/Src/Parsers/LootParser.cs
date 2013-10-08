@@ -26,13 +26,13 @@ namespace WowheadRipper
             {
                 try
                 {
-                    WowheadObject npcObject = new WowheadObject(objectInto);
+                    WowheadObject wowheadObject = new WowheadObject(objectInto);
 
-                    UInt32 lootId = npcObject.GetId();
-                    String name = npcObject.GetFixedName();
-                    UInt32 mincount = npcObject.GetStackArray()[0];
-                    UInt32 maxcount = npcObject.GetStackArray()[1];
-                    Double pct = (npcObject.GetCount() / (Double)serializer.TotalCount) * 100.0f;
+                    UInt32 lootId = wowheadObject.GetId();
+                    String name = wowheadObject.GetFixedName();
+                    UInt32 mincount = wowheadObject.GetStackArray()[0];
+                    UInt32 maxcount = wowheadObject.GetStackArray()[1];
+                    Double pct = (wowheadObject.GetCount() / (Double)serializer.TotalCount) * 100.0f;
                     pct = Math.Round(pct, 3);
                     String stringPct = pct.ToString().Replace(",", "."); // needs to be changed otherwise SQL errors
 
@@ -42,7 +42,7 @@ namespace WowheadRipper
                         lootmode = 1;
 
                     // - infront of quest items
-                    Int32 questId = npcObject.GetQuestId();
+                    Int32 questId = wowheadObject.GetQuestId();
 
                     String str = String.Format("INSERT INTO `{0}` VALUES ( '{1}', '{2}', '{3}', '{4}', '{5}', '{6}' , '{7}'); -- {8}",
                     Def.GetDBName(typeId, subTypeId), entry, questId, stringPct, 1, lootmode, mincount, maxcount, name);

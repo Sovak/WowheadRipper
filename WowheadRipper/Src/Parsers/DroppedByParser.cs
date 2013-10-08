@@ -27,13 +27,13 @@ namespace WowheadRipper
             {
                 try
                 {
-                    WowheadObject npcObject = new WowheadObject(objectInto);
+                    WowheadObject wowheadObject = new WowheadObject(objectInto);
 
-                    UInt32 lootId = npcObject.GetId();
-                    String name = npcObject.GetName();
+                    UInt32 lootId = wowheadObject.GetId();
+                    String name = wowheadObject.GetName();
                     Int32 maxcount = 1; // NYI
                     Int32 mincount = 1; // NYI
-                    Double pct = (npcObject.GetCount() / (Double)npcObject.GetOutOf()) * 100.0f;
+                    Double pct = (wowheadObject.GetCount() / (Double)wowheadObject.GetOutOf()) * 100.0f;
                     pct = Math.Round(pct, 3);
                     String stringPct = pct.ToString().Replace(",", "."); // needs to be changed otherwise SQL errors
 

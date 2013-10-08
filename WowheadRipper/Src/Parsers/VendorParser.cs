@@ -26,11 +26,11 @@ namespace WowheadRipper
             {
                 try
                 {
-                    WowheadObject npcObject = new WowheadObject(objectInto);
+                    WowheadObject wowheadObject = new WowheadObject(objectInto);
 
-                    UInt32 id = npcObject.GetId();
-                    String name = npcObject.GetFixedName();
-                    UInt32 extendedCost = ExtendedCosts.GetExtendedCost(npcObject.GetCurrencyCost(), npcObject.GetItemCost(), 0);
+                    UInt32 id = wowheadObject.GetId();
+                    String name = wowheadObject.GetFixedName();
+                    UInt32 extendedCost = ExtendedCosts.GetExtendedCost(wowheadObject.GetCurrencyCost(), wowheadObject.GetItemCost(), 0);
 
                     // Needed (NULL cost ?)
                     if (extendedCost == 2)
