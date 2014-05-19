@@ -174,26 +174,22 @@ namespace WowheadRipper
             return File.ReadAllLines(String.Format("./wowhead/{0}", fileName)).ToList();
         }
 
-        public static void WriteSQL(UInt32 type, UInt32 entry, List<String> strList)
+        public static void WriteSQL(UInt32 type, UInt32 entry, string str)
         {
-            mutex.WaitOne();
             if (singleFileStream != null)
             {
-                foreach (var str in strList)
-                    singleFileStream.WriteLine(str);
+                mutex.WaitOne();
+                singleFileStream.WriteLine(str);
+                mutex.ReleaseMutex();
             }
             else
             {
                 String fileName = String.Format("{0}_{1}.sql", Defines.GetRawName(type), entry);
-                StreamWriter streamWriter = new StreamWriter(fileName, true);
-
-                foreach (var str in strList)
+                using (StreamWriter streamWriter = new StreamWriter(fileName, true))
+                {
                     streamWriter.WriteLine(str);
-
-                streamWriter.Flush();
-                streamWriter.Close();
+                }
             }
-            mutex.ReleaseMutex();
         }
     }
 }

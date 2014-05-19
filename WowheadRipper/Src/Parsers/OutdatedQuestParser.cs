@@ -17,16 +17,16 @@ namespace WowheadRipper
         [Ripper(Defines.ParserType.PARSER_TYPE_OUTDATED_QUEST)]
         public static void ParseOutdatedQuests(uint entry, uint typeId, uint subTypeId, List<string> content)
         {
-            List<String> strList = new List<String>();
+            StringBuilder strBuilder = new StringBuilder();
             foreach (string line in content)
             {
                 Match match = Defines.GetDataRegex(typeId, subTypeId).Match(line);
                 if (match.Success)
                 {
-                    strList.Add(string.Format("UPDATE `{0}` SET minLvl = -1, maxLvl = -1 WHERE entry = {1};", Defines.GetDBName(typeId, subTypeId), entry));
+                    strBuilder.AppendLine(string.Format("UPDATE `{0}` SET minLvl = -1, maxLvl = -1 WHERE entry = {1};", Defines.GetDBName(typeId, subTypeId), entry));
                 }
             }
-            WriteSQL(typeId, entry, strList);
+            WriteSQL(typeId, entry, strBuilder.ToString());
             Console.WriteLine("{0}% - Parsed {1} data for entry {2}", Math.Round(++dataDone / (float)commandList.Count * 100, 2), Defines.GetStreamName(typeId, subTypeId), entry);
         }
     }

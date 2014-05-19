@@ -17,9 +17,9 @@ namespace WowheadRipper
         [Ripper(Defines.ParserType.PARSER_TYPE_LOOT)]
         public static void LootParser(uint entry, uint typeId, uint subTypeId, List<String> content)
         {
-            List<String> strList = new List<String>();
-            strList.Add(String.Format("-- Parsing {0} loot for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
-            strList.Add(String.Format("DELETE FROM `{0}` WHERE entry = {1};", Defines.GetDBName(typeId, subTypeId), entry));
+            StringBuilder strBuilder = new StringBuilder();
+            strBuilder.AppendLine(String.Format("-- Parsing {0} loot for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
+            strBuilder.AppendLine(String.Format("DELETE FROM `{0}` WHERE entry = {1};", Defines.GetDBName(typeId, subTypeId), entry));
 
             WowheadSerializer serializer = new WowheadSerializer(content, typeId, subTypeId);
 
@@ -47,7 +47,7 @@ namespace WowheadRipper
 
                     String str = String.Format("INSERT INTO `{0}` VALUES ( '{1}', '{2}', '{3}', '{4}', '{5}', '{6}' , '{7}'); -- {8}",
                     Defines.GetDBName(typeId, subTypeId), entry, questId, stringPct, 1, lootmode, mincount, maxcount, name);
-                    strList.Add(str);
+                    strBuilder.AppendLine(str);
                 }
                 catch (Exception e)
                 {
@@ -58,17 +58,17 @@ namespace WowheadRipper
             // We need to parse aditional data
             // Gameobjects 
             if (typeId == 1)
-                strList.Add(String.Format("UPDATE `gameobject_template` SET data1 = {0} WHERE entry = {0};", entry));
+                strBuilder.AppendLine(String.Format("UPDATE `gameobject_template` SET data1 = {0} WHERE entry = {0};", entry));
             // Item Contains
             // Disenchanging
             foreach (String s in content)
                 if (Defines.StringContains(s, "[tooltip=tooltip_reqenchanting]").Success)
                     if (typeId == 2 && subTypeId == 3)
-                        strList.Add(String.Format("UPDATE `item_template` SET DisenchantID = '{0}', RequiredDisenchantSkill = '{1}' WHERE entry = '{0}';", entry, /*Defines.StringContains(line, "[tooltip=tooltip_reqenchanting]").Success ? */uint.Parse(Defines.GetStringBetweenTwoOthers(s, "[tooltip=tooltip_reqenchanting]", "[/tooltip]"))/* : 1)*/));
+                        strBuilder.AppendLine(String.Format("UPDATE `item_template` SET DisenchantID = '{0}', RequiredDisenchantSkill = '{1}' WHERE entry = '{0}';", entry, /*Defines.StringContains(line, "[tooltip=tooltip_reqenchanting]").Success ? */uint.Parse(Defines.GetStringBetweenTwoOthers(s, "[tooltip=tooltip_reqenchanting]", "[/tooltip]"))/* : 1)*/));
 
-            strList.Add(String.Format("-- Parsed {0} loot for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
-            strList.Add("");
-            WriteSQL(typeId, entry, strList);
+            strBuilder.AppendLine(String.Format("-- Parsed {0} loot for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
+            strBuilder.AppendLine("");
+            WriteSQL(typeId, entry, strBuilder.ToString());
 
             Console.WriteLine("{0}% - Parsed {1} loot for entry {2}", Math.Round(++dataDone / (float)commandList.Count * 100, 2), Defines.GetStreamName(typeId, subTypeId), entry);
         }
