@@ -17,9 +17,9 @@ namespace WowheadRipper
         [Ripper(Defines.ParserType.PARSER_TYPE_DROPPEDBY)]
         public static void DroppedByParser(uint entry, uint typeId, uint subTypeId, List<String> content)
         {
-
-            WriteSQL(typeId, entry, String.Format("-- Parsing {0} loot for entry {1}", Def.GetStreamName(typeId, subTypeId), entry));
-            WriteSQL(typeId, entry, String.Format("DELETE FROM `{0}` WHERE item = {1};", Def.GetDBName(typeId, subTypeId), entry));
+            List<String> strList = new List<String>();
+            strList.Add(String.Format("-- Parsing {0} loot for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
+            strList.Add(String.Format("DELETE FROM `{0}` WHERE item = {1};", Defines.GetDBName(typeId, subTypeId), entry));
 
             WowheadSerializer serializer = new WowheadSerializer(content, typeId, subTypeId);
 
@@ -38,8 +38,8 @@ namespace WowheadRipper
                     String stringPct = pct.ToString().Replace(",", "."); // needs to be changed otherwise SQL errors
 
                     String str = String.Format("INSERT INTO `{0}` VALUES ( '{1}', '{2}', '{3}', '{4}', '{5}', '{6}' , '{7}'); -- {8}",
-                    Def.GetDBName(typeId, subTypeId), lootId, entry, stringPct, 1, 0, mincount, maxcount, name);
-                    WriteSQL(typeId, entry, str);
+                    Defines.GetDBName(typeId, subTypeId), lootId, entry, stringPct, 1, 0, mincount, maxcount, name);
+                    strList.Add(str);
                 }
                 catch (Exception e)
                 {
@@ -47,9 +47,11 @@ namespace WowheadRipper
                 }
             }
 
-            WriteSQL(typeId, entry, String.Format("-- Parsed {0} loot for entry {1}", Def.GetStreamName(typeId, subTypeId), entry));
-            WriteSQL(typeId, entry, "");
-            Console.WriteLine("{0}% - Parsed {1} data for entry {2}", Math.Round(++datad / (Double)commandList.Count * 100, 2), Def.GetStreamName(typeId, subTypeId), entry);
+            strList.Add(String.Format("-- Parsed {0} loot for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
+            strList.Add("");
+            WriteSQL(typeId, entry, strList);
+
+            Console.WriteLine("{0}% - Parsed {1} data for entry {2}", Math.Round(++dataDone / (Double)commandList.Count * 100, 2), Defines.GetStreamName(typeId, subTypeId), entry);
         }
     }
 }

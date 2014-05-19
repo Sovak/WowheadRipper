@@ -55,7 +55,7 @@ namespace WowheadRipper
             for (Int32 i = 0; i < _content.Count; i++)
             {
                 String line = GetFixedLine(i);
-                Match match = Program.Def.GetDataRegex(_typeId, _subTypeId).Match(line);
+                Match match = Defines.GetDataRegex(_typeId, _subTypeId).Match(line);
 
                 if (match.Success)
                 {
@@ -65,13 +65,16 @@ namespace WowheadRipper
                     };
 
                     if (line.Contains("_totalCount"))
-                        TotalCount = UInt32.Parse(Program.Def.GetStringBetweenTwoOthers(line, "_totalCount: ", ","));
+                        TotalCount = UInt32.Parse(Defines.GetStringBetweenTwoOthers(line, "_totalCount: ", ","));
                     else
                         TotalCount = 0;
 
                     Objects = (Object[])json.DeserializeObject(match.Groups[1].Captures[0].Value);
                 }
             }
+
+            if (Objects == null)
+                Objects = new Object[0];
         }
     }
 }

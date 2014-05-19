@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace WowheadRipper
 {
-    public class Defines
+    public static class Defines
     {
         public enum ParserType
         {
@@ -16,16 +16,16 @@ namespace WowheadRipper
 
         private const int _maxTypeId = 5;
         private const int _maxSubTypeId = 5;
-        private uint[] _maxSubClassTypeId = new uint[_maxTypeId];
-        private string[] _wowhead_raw_name = new string[_maxTypeId];
-        private string[,] _id_name = new string[_maxTypeId, _maxSubTypeId];
-        private string[,] _id_db_name = new string[_maxTypeId, _maxSubTypeId];
-        private Regex[,] _id_regex = new Regex[_maxTypeId, _maxSubTypeId];
-        private ParserType[,] _parser_type = new ParserType[_maxTypeId, _maxSubTypeId];
+        private static uint[] _maxSubClassTypeId = new uint[_maxTypeId];
+        private static string[] _wowhead_raw_name = new string[_maxTypeId];
+        private static string[,] _id_name = new string[_maxTypeId, _maxSubTypeId];
+        private static string[,] _id_db_name = new string[_maxTypeId, _maxSubTypeId];
+        private static Regex[,] _id_regex = new Regex[_maxTypeId, _maxSubTypeId];
+        private static ParserType[,] _parser_type = new ParserType[_maxTypeId, _maxSubTypeId];
 
-        public uint GetMaxTypeId() { return _maxTypeId; }
-        public uint GetMaxSubTypeId(int i) { return _maxSubClassTypeId[i]; }
-        public int GetValidFlags(UInt32 TypeId, Int32 Flags)
+        public static uint GetMaxTypeId() { return _maxTypeId; }
+        public static uint GetMaxSubTypeId(int i) { return _maxSubClassTypeId[i]; }
+        public static int GetValidFlags(UInt32 TypeId, Int32 Flags)
         {
             int f = 0;
             for (Int32 i = 0; i < 32; i++)
@@ -35,7 +35,7 @@ namespace WowheadRipper
             return f;
         }
 
-        public List<int> ExtractFlags(UInt32 typeId, Int32 num)
+        public static List<int> ExtractFlags(UInt32 typeId, Int32 num)
         {
             List<int> f = new List<int>();
             for (Int32 i = 0; i < 32; i++)
@@ -45,25 +45,14 @@ namespace WowheadRipper
             return f;
         }
 
-        public List<uint> GetAllNumbersOfString(string str)
-        {
-            uint num = 0;
-            List<uint> numList = new List<uint>();
-            string[] numbers = Regex.Split(str, @"\D");
-            foreach (string number in numbers)
-                if (uint.TryParse(number, out num))
-                    numList.Add(num);
-            return numList;
-        }
-
-        public string GetStreamName(UInt32 TypeId, UInt32 subTypeId) { return _id_name[TypeId, subTypeId]; }
-        public string GetRawName(UInt32 TypeId) { return _wowhead_raw_name[TypeId]; }
-        public string GetDBName(UInt32 TypeId, UInt32 subTypeId) { return _id_db_name[TypeId, subTypeId]; }
-        public string GenerateWowheadUrl(UInt32 typeId, UInt32 entry) { return string.Format("http://www.wowhead.com/{0}={1}", _wowhead_raw_name[typeId], entry); }
-        public string GenerateWowheadFileName(UInt32 typeId, UInt32 entry) { return string.Format("{0}={1}", _wowhead_raw_name[typeId], entry); }
-        public Regex GetDataRegex(UInt32 TypeId, UInt32 subTypeId) { return _id_regex[TypeId, subTypeId]; }
-        public ParserType GetParserType(UInt32 TypeId, UInt32 subTypeId) { return _parser_type[TypeId, subTypeId]; }
-        public string GetStringBetweenTwoOthers(string baseString, string begin, string end)
+        public static string GetStreamName(UInt32 TypeId, UInt32 subTypeId) { return _id_name[TypeId, subTypeId]; }
+        public static string GetRawName(UInt32 TypeId) { return _wowhead_raw_name[TypeId]; }
+        public static string GetDBName(UInt32 TypeId, UInt32 subTypeId) { return _id_db_name[TypeId, subTypeId]; }
+        public static string GenerateWowheadUrl(UInt32 typeId, UInt32 entry) { return string.Format("http://www.wowhead.com/{0}={1}", _wowhead_raw_name[typeId], entry); }
+        public static string GenerateWowheadFileName(UInt32 typeId, UInt32 entry) { return string.Format("{0}={1}", _wowhead_raw_name[typeId], entry); }
+        public static Regex GetDataRegex(UInt32 TypeId, UInt32 subTypeId) { return _id_regex[TypeId, subTypeId]; }
+        public static ParserType GetParserType(UInt32 TypeId, UInt32 subTypeId) { return _parser_type[TypeId, subTypeId]; }
+        public static string GetStringBetweenTwoOthers(string baseString, string begin, string end)
         {
             begin = StringToRegex(begin);
             end = StringToRegex(end);
@@ -71,12 +60,12 @@ namespace WowheadRipper
             return Regex.Split(baseString, string.Format("(?<={0})(.*?)(?={1})", begin, end))[1];
         }
 
-        public Match StringContains(string str, string contains)
+        public static Match StringContains(string str, string contains)
         {
             return Regex.Match(str, StringToRegex(contains));
         }
 
-        public string StringToRegex(string str)
+        public static string StringToRegex(string str)
         {
             str = str.Replace("=", "\\=");
             str = str.Replace("[", "\\[");
@@ -86,7 +75,7 @@ namespace WowheadRipper
             return str;
         }
 
-        public Defines()
+        static Defines()
         {
             // Zone Parser
             _wowhead_raw_name[0] = "zone";

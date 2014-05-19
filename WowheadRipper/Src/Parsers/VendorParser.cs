@@ -17,8 +17,9 @@ namespace WowheadRipper
         [Ripper(Defines.ParserType.PARSER_TYPE_VENDOR)]
         public static void ParseVendor(UInt32 entry, UInt32 typeId, UInt32 subTypeId, List<String> content)
         {
-            WriteSQL(typeId, entry, String.Format("-- Parsing {0} vendor data for entry {1}", Def.GetStreamName(typeId, subTypeId), entry));
-            WriteSQL(typeId, entry, String.Format("DELETE FROM `{0}` WHERE entry = {1};", Def.GetDBName(typeId, subTypeId), entry));
+            List<String> strList = new List<String>();
+            strList.Add(String.Format("-- Parsing {0} vendor data for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
+            strList.Add(String.Format("DELETE FROM `{0}` WHERE entry = {1};", Defines.GetDBName(typeId, subTypeId), entry));
 
             WowheadSerializer serializer = new WowheadSerializer(content, typeId, subTypeId);
 
@@ -37,8 +38,8 @@ namespace WowheadRipper
                         extendedCost = 0;
 
                     String str = String.Format("INSERT INTO `{0}` VALUES ( '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}'); -- {8}",
-                    Def.GetDBName(typeId, subTypeId), entry, 0, id, 0, 0, extendedCost, 1, name);
-                    WriteSQL(typeId, entry, str);
+                    Defines.GetDBName(typeId, subTypeId), entry, 0, id, 0, 0, extendedCost, 1, name);
+                    strList.Add(str);
                 }
                 catch (Exception e)
                 {
@@ -46,9 +47,11 @@ namespace WowheadRipper
                 }
             }
 
-            WriteSQL(typeId, entry, String.Format("-- Parsed {0} data for entry {1}", Def.GetStreamName(typeId, subTypeId), entry));
-            WriteSQL(typeId, entry, "");
-            Console.WriteLine("{0}% - Parsed {1} data for entry {2}", Math.Round(++datad / (float)commandList.Count * 100, 2), Def.GetStreamName(typeId, subTypeId), entry);
+            strList.Add(String.Format("-- Parsed {0} data for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
+            strList.Add("");
+            WriteSQL(typeId, entry, strList);
+
+            Console.WriteLine("{0}% - Parsed {1} data for entry {2}", Math.Round(++dataDone / (float)commandList.Count * 100, 2), Defines.GetStreamName(typeId, subTypeId), entry);
         }
     }
 }
