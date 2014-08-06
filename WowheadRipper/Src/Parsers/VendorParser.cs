@@ -18,8 +18,11 @@ namespace WowheadRipper
         public static void ParseVendor(UInt32 entry, UInt32 typeId, UInt32 subTypeId, List<String> content)
         {
             StringBuilder strBuilder = new StringBuilder();
+            UInt32 slot = 0;
+            UInt16 type = 0;
             strBuilder.AppendLine(String.Format("-- Parsing {0} vendor data for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
             strBuilder.AppendLine(String.Format("DELETE FROM `{0}` WHERE entry = {1};", Defines.GetDBName(typeId, subTypeId), entry));
+            strBuilder.AppendLine(String.Format("INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `type`) VALUES "));
 
             WowheadSerializer serializer = new WowheadSerializer(content, typeId, subTypeId);
 
@@ -30,21 +33,26 @@ namespace WowheadRipper
                     WowheadObject wowheadObject = new WowheadObject(objectInto);
 
                     UInt32 id = wowheadObject.GetId();
+                    type = 1;
                     String name = wowheadObject.GetFixedName();
-                    UInt32 extendedCost = ExtendedCosts.GetExtendedCost(wowheadObject.GetCurrencyCost(), wowheadObject.GetItemCost(), 0);
+                    UInt64 cost = wowheadObject.GetMoneyCost();
+                    if (cost == 0)
+                    {
+                        // type = 2;
+                        cost = ExtendedCosts.GetExtendedCost(wowheadObject.GetCurrencyCost(), wowheadObject.GetItemCost(), 0);
+                        if (cost == 0)
+                            cost = 99999;
+                    }
 
-                    // Needed (NULL cost ?)
-                    if (extendedCost == 2)
-                        extendedCost = 0;
-
-                    String str = String.Format("INSERT INTO `{0}` VALUES ( '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}'); -- {8}",
-                    Defines.GetDBName(typeId, subTypeId), entry, 0, id, 0, 0, extendedCost, 1, name);
+                    // (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `type`)
+                    String str = String.Format("('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}'); -- {7}", entry, slot, id, 0, 0, cost, type, name);
                     strBuilder.AppendLine(str);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
+                slot++;
             }
 
             strBuilder.AppendLine(String.Format("-- Parsed {0} data for entry {1}", Defines.GetStreamName(typeId, subTypeId), entry));
